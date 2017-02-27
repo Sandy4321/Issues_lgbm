@@ -31,23 +31,7 @@ def myeval(preds, train_data):
     return 'loss', value, False
 
 
-
-
 import lightgbm as lgb
-
-
-"""
-y_train = df_train[0]
-y_test = df_test[0]
-X_train = df_train.drop(0, axis=1)
-X_test = df_test.drop(0, axis=1)
-
-# create dataset for lightgbm
-lgb_train = lgb.Dataset(X_train, y_train)
-lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
-
-
-"""
 
 
 # create dataset for lightgbm
@@ -55,35 +39,13 @@ lgb_train = lgb.Dataset(trn_X, trn_y)
 lgb_eval = lgb.Dataset(val_X, val_y,reference=lgb_train)#
 
 
-# specify your configurations as a dict
-params = {
-    'task': 'train',
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'l2', 'auc'},
-    'num_leaves': 31,
-    'learning_rate': 0.05,
-    'feature_fraction': 0.9,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'verbose': 0
-}
 
-print('Start training...')
-# train
-gbm = lgb.train(params,
-                lgb_train,
-                num_boost_round=50,
-                valid_sets=lgb_eval,
-                early_stopping_rounds=5)
-##---
-"""
 # specify your configurations as a dict
 params = {
     'task': 'train',
     'boosting_type': 'gbdt',
     'objective': 'regression',
-    'metric': {'mse'},
+#    'metric': {'mse'},
     'num_leaves': 31,
     'learning_rate': 0.2,
     'feature_fraction': 0.9,
@@ -104,21 +66,10 @@ gbm = lgb.train(params,
                 feval=myeval, 
                 early_stopping_rounds=30
                 )
-"""
-###---
-#print('Save model...')
-## save model to file
-#gbm.save_model('model.txt')
-#
-#print('Start predicting...')
-## predict
-#y_pred = gbm.predict(val_X, num_iteration=gbm.best_iteration)
-## eval
-#
+
+
 y_true=np.array(val_y)
 
 #print( myeval(gbm.predict(trn_X, num_iteration=gbm.best_iteration), lgb_train))
-#print( myeval(gbm.predict(val_X, num_iteration=gbm.best_iteration), lgb_eval))
+print( myeval(gbm.predict(val_X, num_iteration=gbm.best_iteration), lgb_eval))
 print( myeval(gbm.predict(val_X), lgb_eval))
-from sklearn.metrics import mean_squared_error
-print('The rmse of prediction is:', mean_squared_error(val_y,gbm.predict(val_X)) ** 0.5)
